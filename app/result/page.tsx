@@ -1,8 +1,10 @@
 "use client";
 
-import ImageResult from "./imageResultPage";
+import ImageResult from "./imageResult";
 import { useSearchParams } from 'next/navigation'
 import { redirect } from 'next/navigation';
+import Header from '../header';
+import Footnote from "../footer";
 
 export default function ResultPage() {
 
@@ -14,8 +16,10 @@ export default function ResultPage() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col justify-between">
+      <Header />
       <ImageResult imageId={imageId}/>
+      <Footnote />
     </div>
   );
 }

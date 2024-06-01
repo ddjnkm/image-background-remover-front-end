@@ -44,7 +44,9 @@ const ImageUpload: React.FC = () => {
     const reader = new FileReader();
     reader.onloadend = async () => {
 
-      const base64String = (reader.result as string).replace('data:image/jpeg;base64,','');
+      const base64String = (reader.result as string).replace('data:image/jpeg;base64,','')
+                                                    .replace('data:image/jpg;base64,','')
+                                                    .replace('data:image/png;base64,','');
       console.log(base64String)
       const controller = new AbortController();
       const signal = controller.signal;
@@ -100,24 +102,24 @@ const ImageUpload: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Free Profile Picture Generator</h1>
-
-      <button className="upload-button" onClick={handleButtonClick}>
-        Upload Image
-      </button>
-      <input type='file' id='file' accept="image/*" ref={inputFile} style={{display: 'none'}} onChange={handleImageChange}/>
-      
-      {preview && <img src={preview} alt="Preview" style={{ width: '300px', marginTop: '10px' }} />}
-      
-      <br></br>
-
-      <button onClick={handleSubmit} disabled={loading}>
-        {loading ? 'Processing Image...' : 'Submit.'}
-      </button>
-
-      {message && <p>{message}</p>}
-
+    <div className='flex-col'>
+      <div className='flex justify-center p-5'>
+        <button className="rounded-md upload-button bg-orange-700 p-5" onClick={handleButtonClick}>
+          Upload Image
+        </button>
+        <input type='file' id='file' accept="image/*" ref={inputFile} style={{display: 'none'}} onChange={handleImageChange}/>
+      </div>
+      <div className='flex justify-center'>
+        {preview && <img src={preview} alt="Preview" style={{ width: '300px', marginTop: '10px' }} />}
+      </div>
+      <div className='flex justify-center p-5'>
+        <button className="rounded-md bg-orange-700 p-5" onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Processing Image...' : 'Submit.'}
+        </button>
+      </div>
+      <div className='flex justify-center'>
+        {message && <p>{message}</p>}
+      </div>
     </div>
   );
 };
