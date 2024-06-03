@@ -78,7 +78,7 @@ const ImageUpload: React.FC = () => {
         try {
           const imageKey = await result.text();
 
-          router.push('/result?imageId='+imageKey);
+          router.push('/photoshopMeIn?imageId='+imageKey);
         } catch (error) {
           console.error('Error fetching image URL:', error);
         }

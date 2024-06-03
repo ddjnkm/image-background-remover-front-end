@@ -1,7 +1,7 @@
 const Footnote: React.FC = () => {
     return (
         <div className="flex justify-center p-5">
-            Free Profile Picture Generator 2024
+            © 2024 Photoskills, All Rights Reserved.
         </div>
     );
   };

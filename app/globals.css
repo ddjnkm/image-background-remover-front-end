@@ -8,7 +8,7 @@
   --background-end-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
@@ -43,7 +43,7 @@ body {
   border: 1px solid rgba(0,0,0,0.5);
   overflow: hidden;
   margin: auto;
-  margin-top: 5rem;
+  margin-top: 1rem;
   background-color: rgba(0,0,0,0.5);
 }
 
@@ -88,7 +88,7 @@ body {
   align-items: center;
 }
 
-.flip-button, .download-button {
+.flip-button, .download-button, .upload-background-image-button {
   margin-top: 1rem;
   padding: 0.1rem 0.2rem;
   background-color: #007bff;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import Draggable, { DraggableData } from 'react-draggable';
 import { ResizableBox, ResizableBoxProps } from 'react-resizable';
 import BackgroundGallery from './backgroundGallery';
@@ -11,9 +11,10 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   
   const BUCKET_URL = process.env.AWS_IMAGE_BUCKET_URL ?? 'https://image-background-remover-modified-images.s3.us-east-2.amazonaws.com';
 
-  const [hasLoadedOnce, setHasLoadedOnce] = useState<boolean>(false);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const backgroundImageFileInputRef = useRef<HTMLInputElement | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+  const [editorContainerDimensions, setEditorContainerDimensions] = useState<{ width: number, height: number }>({ width: 500, height: 500 });
   const [overlayImage, setOverlayImage] = useState<HTMLImageElement | null>(null);
   const [rotation, setRotation] = useState<number>(0);
   const [overlayPosition, setOverlayPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -22,6 +23,11 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   const [overlayRatioSize, setOverlayRatioSize] = useState<number>(100);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLImageElement>(null);
+
+  const styleEditorContainer: React.CSSProperties = {
+    width: editorContainerDimensions.width,
+    height: editorContainerDimensions.height,
+  };
 
   function fetchImageUrl(imageId: string) {
     return `${BUCKET_URL}/${imageId}`;
@@ -41,7 +47,6 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
 
   useEffect(() => {
     if (overlayImage === null || backgroundImage === null) {
-      setHasLoadedOnce(true);
       const bgImage = new Image();
       bgImage.crossOrigin = 'anonymous';
       bgImage.src = '/assets/background_picture_1.jpg';
@@ -56,7 +61,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
 
       bgImage.onload = () => {
         setBackgroundImage(bgImage);
-        setInitialOverlayPosition(bgImage, defaultOverySize);
+        setInitialOverlayPosition(bgImage.width, bgImage.height, defaultOverySize);
       }
 
       ovImage.onload = () => setOverlayImage(ovImage);
@@ -68,12 +73,53 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     const bgImage = new Image();
     bgImage.crossOrigin = 'anonymous';
     bgImage.src = image;
-    setBackgroundImage(bgImage);
+    bgImage.onload = () => {
+      setBackgroundImage(bgImage);
+      const imgWidth = 500;
+      const imgHeight = bgImage.height * (500/bgImage.width);
+      setEditorContainerDimensions({width: imgWidth, height: imgHeight});
+      setInitialOverlayPosition(imgWidth, imgHeight, overlaySize);
+    }
   };
 
-  const setInitialOverlayPosition = (bgImage: HTMLImageElement, overlaySize: any) => {
-    const initialX = (bgImage.width - overlaySize.width) / 2;
-    const initialY = bgImage.height - overlaySize.height;
+  // Handler to trigger file input click
+  const triggerBackgroundImageFileInput = () => {
+    backgroundImageFileInputRef.current?.click();
+  };
+
+  // Function to convert File to HTMLImageElement
+  const fileToImage = (file: File): Promise<HTMLImageElement> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleBackgroundImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      // Convert File to HTMLImageElement
+      const img = await fileToImage(file);
+      setBackgroundImage(img);
+      const imgWidth = 500;
+      const imgHeight = img.height * (500/img.width);
+      setEditorContainerDimensions({width: imgWidth, height: imgHeight});
+      setInitialOverlayPosition(imgWidth, imgHeight, overlaySize);
+    }
+  };
+
+  const setInitialOverlayPosition = (bgImgWidth: number, bgImgHeight: number, overlaySize: any) => {
+    const initialX = (bgImgWidth - overlaySize.width) / 2;
+    const initialY = bgImgHeight - overlaySize.height;
     setOverlayPosition({ x: initialX, y: initialY });
   };
 
@@ -94,8 +140,8 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = backgroundImage.width;
-    canvas.height = backgroundImage.height;
+    canvas.width = editorContainerDimensions.width;
+    canvas.height = editorContainerDimensions.height;
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     const { x, y } = overlayPosition;
@@ -110,7 +156,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     ctx.restore();
 
     const link = document.createElement('a');
-    link.download = 'profile-picture.png';
+    link.download = 'result.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
@@ -121,7 +167,10 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
 
   return (
     <div>
-      <div className="editor-container">
+      <div className='flex justify-center'>
+        <button onClick={triggerBackgroundImageFileInput} className="upload-background-image-button">Upload Your Own Background Image!</button> 
+      </div>
+      <div className="editor-container" style={styleEditorContainer}>
         <img src={backgroundImage?.src} alt="" className="background-image" />
         <Draggable onStop={handleDragStop} position={overlayPosition}>
           <ResizableBox
@@ -182,6 +231,13 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
         <button onClick={toggleFlip} className="flip-button">Flip</button>
         <button onClick={handleDownload} className="download-button">Download</button>
       </div>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleBackgroundImageUpload}
+        ref={backgroundImageFileInputRef}
+        style={{ display: 'none' }} // Hide the actual file input
+      />
       <BackgroundGallery onSelect={handleBackgroundImageSelect} />
     </div>
   );
