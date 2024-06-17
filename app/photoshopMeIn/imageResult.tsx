@@ -11,13 +11,20 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   
   const BUCKET_URL = process.env.AWS_IMAGE_BUCKET_URL ?? 'https://image-background-remover-modified-images.s3.us-east-2.amazonaws.com';
 
+  const backgroundImageFileInputRef = useRef<HTMLInputElement | null>(null);  // reference for file input
+
+  const LG_VIEW_IMAGE_WIDTH = 500;
+  const MD_VIEW_IMAGE_WIDTH = 200;
+  const SM_VIEW_IMAGE_WIDTH = 100;
+
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
-  const backgroundImageFileInputRef = useRef<HTMLInputElement | null>(null);
-  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
-  const [editorContainerDimensions, setEditorContainerDimensions] = useState<{ width: number, height: number }>({ width: 500, height: 500 });
-  const [overlayImage, setOverlayImage] = useState<HTMLImageElement | null>(null);
   const [rotation, setRotation] = useState<number>(0);
+  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+  const [backgroundImageSize, setBackgroundImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
+  const [backgroundImageOriginalSize, setBackgroundImageOriginalSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [overlayImage, setOverlayImage] = useState<HTMLImageElement | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [overlayActualSize, setOverlayActualSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [overlayOriginalSize, setOverlayOriginalSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [overlaySize, setOverlaySize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [overlayRatioSize, setOverlayRatioSize] = useState<number>(100);
@@ -25,12 +32,25 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   const overlayRef = useRef<HTMLImageElement>(null);
 
   const styleEditorContainer: React.CSSProperties = {
-    width: editorContainerDimensions.width,
-    height: editorContainerDimensions.height,
+    width: backgroundImageSize.width,
+    height: backgroundImageSize.height,
   };
 
   function fetchImageUrl(imageId: string) {
     return `${BUCKET_URL}/${imageId}`;
+  }
+
+  function calculateBackgroundStartingSize (bgWidth: number, bgHeight: number) {
+    if (bgWidth > LG_VIEW_IMAGE_WIDTH) {
+      const x = LG_VIEW_IMAGE_WIDTH / bgWidth;
+      const height = bgHeight * x;
+      const width = bgWidth * x;
+      return {width, height}
+    }
+    const x = bgWidth / LG_VIEW_IMAGE_WIDTH;
+    const height = bgHeight * x;
+    const width = bgWidth * x;
+    return {width, height}
   }
 
   function calculateOverlayStartingSize (bgWidth: number, bgHeight: number, ovWidth: number, ovHeight: number) {
@@ -54,16 +74,16 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       const ovImage = new Image();
       ovImage.crossOrigin = 'anonymous';
       ovImage.src = fetchImageUrl(imageId);
+      setOverlayActualSize({width: ovImage.width, height: ovImage.height});
 
-      const defaultOverySize = calculateOverlayStartingSize(bgImage.width, bgImage.height, ovImage.width, ovImage.height);
-      setOverlayOriginalSize({width: defaultOverySize.width, height: defaultOverySize.height});
-      setOverlaySize({width: defaultOverySize.width, height: defaultOverySize.height});
+      const defaultBackgroundSize = calculateBackgroundStartingSize(bgImage.width, bgImage.height);
+      setBackgroundImageSize({width: defaultBackgroundSize.width, height: defaultBackgroundSize.height});
+      const defaultOverlaySize = calculateOverlayStartingSize(defaultBackgroundSize.width, defaultBackgroundSize.height, ovImage.width, ovImage.height);
+      setOverlayOriginalSize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+      setOverlaySize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+      setInitialOverlayPosition(defaultBackgroundSize.width, defaultBackgroundSize.height, defaultOverlaySize);
 
-      bgImage.onload = () => {
-        setBackgroundImage(bgImage);
-        setInitialOverlayPosition(bgImage.width, bgImage.height, defaultOverySize);
-      }
-
+      bgImage.onload = () => setBackgroundImage(bgImage);
       ovImage.onload = () => setOverlayImage(ovImage);
     }
   });
@@ -75,10 +95,13 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     bgImage.src = image;
     bgImage.onload = () => {
       setBackgroundImage(bgImage);
-      const imgWidth = 500;
-      const imgHeight = bgImage.height * (500/bgImage.width);
-      setEditorContainerDimensions({width: imgWidth, height: imgHeight});
-      setInitialOverlayPosition(imgWidth, imgHeight, overlaySize);
+      const backgroundSize = calculateBackgroundStartingSize(bgImage.width, bgImage.height);
+      setBackgroundImageSize({width: backgroundSize.width, height: backgroundSize.height});
+      const defaultOverlaySize = calculateOverlayStartingSize(backgroundSize.width, backgroundSize.height, overlayActualSize.width, overlayActualSize.height);
+      setOverlayOriginalSize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+      setOverlaySize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+      setInitialOverlayPosition(backgroundSize.width, backgroundSize.height, defaultOverlaySize);
+      setOverlayRatioSize(100);
     }
   };
 
@@ -110,10 +133,13 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       // Convert File to HTMLImageElement
       const img = await fileToImage(file);
       setBackgroundImage(img);
-      const imgWidth = 500;
-      const imgHeight = img.height * (500/img.width);
-      setEditorContainerDimensions({width: imgWidth, height: imgHeight});
-      setInitialOverlayPosition(imgWidth, imgHeight, overlaySize);
+      const backgroundSize = calculateBackgroundStartingSize(img.width, img.height);
+      setBackgroundImageSize({width: backgroundSize.width, height: backgroundSize.height});
+      const defaultOverlaySize = calculateOverlayStartingSize(backgroundSize.width, backgroundSize.height, overlayActualSize.width, overlayActualSize.height);
+      setOverlayOriginalSize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+      setOverlaySize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+      setInitialOverlayPosition(backgroundSize.width, backgroundSize.height, defaultOverlaySize);
+      setOverlayRatioSize(100);
     }
   };
 
@@ -140,8 +166,8 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = editorContainerDimensions.width;
-    canvas.height = editorContainerDimensions.height;
+    canvas.width = backgroundImageSize.width;
+    canvas.height = backgroundImageSize.height;
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     const { x, y } = overlayPosition;
@@ -166,9 +192,9 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   };
 
   return (
-    <div>
+    <div className='border-t-1 border-b-1 border-gray-300'>
       <div className='flex justify-center'>
-        <button onClick={triggerBackgroundImageFileInput} className="upload-background-image-button">Upload Your Own Background Image!</button> 
+        <button onClick={triggerBackgroundImageFileInput} className="rounded-md bg-rose-400 hover:bg-rose-600 mt-5 p-5">Upload Your Own Background Image!</button> 
       </div>
       <div className="editor-container" style={styleEditorContainer}>
         <img src={backgroundImage?.src} alt="" className="background-image" />
@@ -228,8 +254,8 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
             }}
           />
         </label>
-        <button onClick={toggleFlip} className="flip-button">Flip</button>
-        <button onClick={handleDownload} className="download-button">Download</button>
+        <button onClick={toggleFlip} className="rounded-md bg-blue-600 hover:bg-blue-800 m-2 p-2 text-white">Flip</button>
+        <button onClick={handleDownload} className="rounded-md bg-blue-600 hover:bg-blue-800 m-2 p-2 text-white">Download</button>
       </div>
       <input
         type="file"

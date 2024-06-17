@@ -1,8 +1,8 @@
 "use client"
 
-import ImageUpload from "./imageUpload";
 import Header from '../header';
 import Footnote from "../footer";
+import Headline from "./headline";
 
 export default function HomePage() {
   return (
@@ -11,7 +11,7 @@ export default function HomePage() {
         <Header />          
         </div>
         <div className="grow">
-          <ImageUpload />          
+          <Headline />          
         </div>
         <div>
         <Footnote />          

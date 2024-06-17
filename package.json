@@ -14,6 +14,7 @@
     "@nextui-org/system": "^2.2.0",
     "@nextui-org/theme": "^2.2.4",
     "@types/styled-components": "^5.1.34",
+    "crypto-js": "^4.2.0",
     "framer-motion": "^11.2.9",
     "next": "14.2.3",
     "react": "^18",

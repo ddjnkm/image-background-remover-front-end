@@ -4,6 +4,9 @@ import React, { useState, ChangeEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const ImageUpload: React.FC = () => {
+  const secretKey = process.env.NEXT_PUBLIC_API_KEY;
+  const cryptoJs = require("crypto-js");
+
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,20 +15,6 @@ const ImageUpload: React.FC = () => {
   const inputFile = useRef<HTMLInputElement | null>(null);
 
   const router = useRouter();
-
-  function displayImage(imageUrl: string): void {
-    const imgElement = document.createElement('img');
-    imgElement.src = imageUrl;
-    imgElement.alt = 'S3 Image';
-    imgElement.style.maxWidth = '100%';
-
-    const container = document.getElementById('image-container');
-    if (container) {
-        container.appendChild(imgElement);
-    } else {
-        console.error('Image container not found');
-    }
-  }
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,7 +36,6 @@ const ImageUpload: React.FC = () => {
       const base64String = (reader.result as string).replace('data:image/jpeg;base64,','')
                                                     .replace('data:image/jpg;base64,','')
                                                     .replace('data:image/png;base64,','');
-      console.log(base64String)
       const controller = new AbortController();
       const signal = controller.signal;
 
@@ -57,10 +45,15 @@ const ImageUpload: React.FC = () => {
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
 
       try {
+        const timestamp = Date.now();
+        const message = base64String.substring(0, 50)+"woodstock"+timestamp;
+        const signature = cryptoJs.HmacSHA256(message, secretKey).toString();
         const response = await fetch('http://127.0.0.1:5000/api/modifyImage/1', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'x-signature': signature,
+            'x-timestamp': String(timestamp)
           },
           body: '{"body":"'+base64String+'"}',
           signal: signal,
@@ -104,17 +97,17 @@ const ImageUpload: React.FC = () => {
   return (
     <div className='flex-col'>
       <div className='flex justify-center p-5'>
-        <button className="rounded-md upload-button bg-orange-700 p-5" onClick={handleButtonClick}>
+        <button className="rounded-md upload-button bg-rose-400 hover:bg-rose-600 p-5" onClick={handleButtonClick}>
           Upload Image
         </button>
         <input type='file' id='file' accept="image/*" ref={inputFile} style={{display: 'none'}} onChange={handleImageChange}/>
       </div>
-      <div className='flex justify-center'>
+      <div className='flex justify-center border-gray-300'>
         {preview && <img src={preview} alt="Preview" style={{ width: '300px', marginTop: '10px' }} />}
       </div>
       <div className='flex justify-center p-5'>
-        <button className="rounded-md bg-orange-700 p-5" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Processing Image...' : 'Submit.'}
+        <button className="rounded-md bg-rose-400 hover:bg-rose-600 p-5" onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Processing Image...' : 'Submit'}
         </button>
       </div>
       <div className='flex justify-center'>
