@@ -13,13 +13,13 @@ const Header: React.FC = () => {
       </NavbarContent>
       <NavbarContent className="hidden sm:flex gap-4 lg:mr-10 lg:pr-24 text-black" justify="center">
         <NavbarItem isActive>
-          <Link href="#" aria-current="page">
-            Services
+          <Link href="/home" aria-current="page">
+            Home
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color="foreground" href="#">
-            Contact Us
+          <Link color="foreground" href="/aboutus">
+            About Us
           </Link>
         </NavbarItem>
       </NavbarContent>
