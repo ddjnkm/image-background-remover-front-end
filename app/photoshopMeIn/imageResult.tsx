@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
-import Draggable, { DraggableData } from 'react-draggable';
+import Draggable, { DraggableData, DraggableEvent, DraggableEventHandler } from 'react-draggable';
 import { ResizableBox, ResizableBoxProps } from 'react-resizable';
 import BackgroundGallery from './backgroundGallery';
 
@@ -149,7 +149,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     setOverlayPosition({ x: initialX, y: initialY });
   };
 
-  const handleDragStop = (e: React.MouseEvent, data: DraggableData) => {
+  const handleDragStop: DraggableEventHandler = (e: DraggableEvent, data: DraggableData) => {
     setOverlayPosition({ x: data.x, y: data.y });
   };
 
