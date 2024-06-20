@@ -5,9 +5,9 @@ import { useSearchParams } from 'next/navigation'
 import { redirect } from 'next/navigation';
 import Header from '../header';
 import Footnote from "../footer";
+import { Suspense } from "react";
 
-export default function ResultPage() {
-
+function SearchResultPage() {
   const searchParams = useSearchParams();
   const imageId = searchParams.get('imageId');
 
@@ -16,10 +16,18 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
-      <Header />
-      <ImageResult imageId={imageId}/>
-      <Footnote />
-    </div>
+      <div className="min-h-screen flex flex-col justify-between">
+        <Header />
+        <ImageResult imageId={imageId}/>
+        <Footnote />
+      </div>      
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense>
+      <SearchResultPage />
+    </Suspense>
   );
 }
