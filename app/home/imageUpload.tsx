@@ -4,7 +4,7 @@ import React, { useState, ChangeEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const ImageUpload: React.FC = () => {
-  const backendServerUrl = process.env.BACKEND_SERVER_URL ?? `http://159.203.175.4:8080`;
+  const backendServerUrl = process.env.BACKEND_SERVER_URL ?? `https://159.203.175.4:8080`;
   const secretKey = process.env.NEXT_PUBLIC_API_KEY;
   const cryptoJs = require("crypto-js");
 
