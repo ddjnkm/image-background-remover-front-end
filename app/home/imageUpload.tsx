@@ -4,6 +4,7 @@ import React, { useState, ChangeEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const ImageUpload: React.FC = () => {
+  const backendServerUrl = process.env.BACKEND_SERVER_URL ?? `http://165.227.129.153:8080`;
   const secretKey = process.env.NEXT_PUBLIC_API_KEY;
   const cryptoJs = require("crypto-js");
 
@@ -48,7 +49,8 @@ const ImageUpload: React.FC = () => {
         const timestamp = Date.now();
         const message = base64String.substring(0, 50)+"woodstock"+timestamp;
         const signature = cryptoJs.HmacSHA256(message, secretKey).toString();
-        const response = await fetch('http://127.0.0.1:5000/api/modifyImage/1', {
+        console.log(backendServerUrl);
+        const response = await fetch(`${backendServerUrl}/api/modifyImage/1`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
