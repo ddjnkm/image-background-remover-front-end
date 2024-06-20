@@ -198,6 +198,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       </div>
       <div className="editor-container" style={styleEditorContainer}>
         <img src={backgroundImage?.src} alt="" className="background-image" />
+        // @ts-ignore: No overload code error
         <Draggable onStop={handleDragStop} position={overlayPosition}>
           <ResizableBox
             width={overlaySize.width}
