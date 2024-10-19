@@ -60,7 +60,6 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       const x = bgHeight / ovHeight;
       height = ovHeight * x;
       width = ovWidth * x;
-      console.log(height, width, x)
     }
     return {width, height}
   }
@@ -89,7 +88,6 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   });
 
   const handleBackgroundImageSelect = (image: string) => {
-    console.log(image)
     const bgImage = new Image();
     bgImage.crossOrigin = 'anonymous';
     bgImage.src = image;
@@ -192,7 +190,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   };
 
   return (
-    <div className='border-t-1 border-b-1 border-gray-300'>
+    <div>
       <div className='flex flex-row justify-center'>
       <div className="editor-container" style={styleEditorContainer}>
         <img src={backgroundImage?.src} alt="" className="background-image" />

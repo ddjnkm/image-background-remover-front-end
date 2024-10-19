@@ -42,7 +42,6 @@ const ImageUpload: React.FC = () => {
           return response;
         }
       } catch (error) {
-        console.log(error);
         return error;
       }
     }
@@ -93,7 +92,6 @@ const ImageUpload: React.FC = () => {
           }
   
         } catch (error) {
-          console.log("Error while uploading image: "+error);
           throw error;
         }
       } catch (error) {
