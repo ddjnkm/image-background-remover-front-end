@@ -2,30 +2,61 @@
 
 import React, { useState, ChangeEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { uploadJpgToS3 } from '../lib/s3/s3Adapter';
+import LoadingBar from '../lib/components/loadingBar';
+
+const AWS_SOURCE_BUCKET_NAME = "image-background-remover-source-images";
+const AWS_MODIFIED_BUCKET_URL = 'https://image-background-remover-modified-images.s3.us-east-2.amazonaws.com';
 
 const ImageUpload: React.FC = () => {
-  const backendServerUrl = process.env.BACKEND_SERVER_URL ?? `https://kimd.dev`;
-  const secretKey = process.env.NEXT_PUBLIC_API_KEY;
-  const cryptoJs = require("crypto-js");
-
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorOccurred, setErrorOccurred] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const inputFile = useRef<HTMLInputElement | null>(null);
 
   const router = useRouter();
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      setPreview(URL.createObjectURL(file));
+  function fetchModifiedImageUrl(imageId: string) {
+    return `${AWS_MODIFIED_BUCKET_URL}/${imageId}`;
+  }
+
+  const checkImageWithRetry = async (imageUrl: string) => {
+    const RETRY_INTERVAL = 1000;
+    const TIMEOUT_DURATION = 30000;
+    const timedOut = false;
+    const startTime = Date.now();
+    while (!timedOut) {
+      try {
+        const response = await fetch(imageUrl);
+        if (response.ok) {
+          return response;
+        } else if (response.status === 403) {
+          // If 403, retry
+          const elapsed = Date.now() - startTime;
+          if (elapsed >= TIMEOUT_DURATION) {
+            return response;
+          }
+          await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL)); // Wait before retrying
+        } else {
+          return response;
+        }
+      } catch (error) {
+        console.log(error);
+        return error;
+      }
     }
   };
 
-  const handleSubmit = async () => {
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setErrorOccurred(false);
+      handleSubmit(file);
+    }
+  };
+
+  const handleSubmit = async (selectedImage: File) => {
     if (!selectedImage) {
       alert("Please select an image first!");
       return;
@@ -33,51 +64,38 @@ const ImageUpload: React.FC = () => {
 
     const reader = new FileReader();
     reader.onloadend = async () => {
-
-      const base64String = (reader.result as string).replace('data:image/jpeg;base64,','')
-                                                    .replace('data:image/jpg;base64,','')
-                                                    .replace('data:image/png;base64,','');
-      const controller = new AbortController();
-      const signal = controller.signal;
-
       setLoading(true);
       setMessage(null);
-
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
-
       try {
         const timestamp = Date.now();
-        const message = base64String.substring(0, 50)+"woodstock"+timestamp;
-        const signature = cryptoJs.HmacSHA256(message, secretKey).toString();
-        console.log(backendServerUrl);
-        const response = await fetch(`${backendServerUrl}/api/modifyImage/1`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-signature': signature,
-            'x-timestamp': String(timestamp)
-          },
-          body: '{"body":"'+base64String+'"}',
-          signal: signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const result = await response;
-        setMessage('Processed image successfully!');
-
+        const fileName = "source-image-"+timestamp+".jpg";
+        const jpgFile = Buffer.from(reader.result as ArrayBuffer);
         try {
-          const imageKey = await result.text();
+          const response = await uploadJpgToS3({
+            bucketName: AWS_SOURCE_BUCKET_NAME,
+            key: fileName,
+            file: jpgFile,
+          });
+          try {
+            const imageKey = response;
 
-          router.push('/photoshopMeIn?imageId='+imageKey);
+            const imageCheckResult = await checkImageWithRetry(fetchModifiedImageUrl('modified-'+imageKey));
+
+            if ((imageCheckResult as Response).ok) {
+              router.push('/photoshopMeIn?imageId=modified-'+imageKey);
+            } else {
+              console.error('Error generating image.');
+              throw new Error('Error generating the modified image.');
+            }
+          } catch (error) {
+            console.error('Error fetching image URL:', error);
+            throw error;
+          }
+  
         } catch (error) {
-          console.error('Error fetching image URL:', error);
+          console.log("Error while uploading image: "+error);
+          throw error;
         }
-
       } catch (error) {
         if (error === 'AbortError') {
           setMessage('Image upload timed out.');
@@ -85,11 +103,12 @@ const ImageUpload: React.FC = () => {
           setMessage('Image upload failed!');
         }
         console.error('Error:', error);
+        setErrorOccurred(true);
       } finally {
         setLoading(false);
       }
     };
-    reader.readAsDataURL(selectedImage);
+    reader.readAsArrayBuffer(selectedImage);
   };
 
   const handleButtonClick = () => {
@@ -99,18 +118,16 @@ const ImageUpload: React.FC = () => {
   return (
     <div className='flex-col'>
       <div className='flex justify-center p-5'>
-        <button className="rounded-md upload-button bg-rose-400 hover:bg-rose-600 p-5" onClick={handleButtonClick}>
+        <button className="rounded-md upload-button bg-blue-600 hover:bg-blue-800 p-5 text-white" onClick={handleButtonClick}>
           Upload Image
         </button>
         <input type='file' id='file' accept="image/*" ref={inputFile} style={{display: 'none'}} onChange={handleImageChange}/>
       </div>
-      <div className='flex justify-center border-gray-300'>
-        {preview && <img src={preview} alt="Preview" style={{ width: '300px', marginTop: '10px' }} />}
+      <div className='flex justify-center p-5'>
+          {loading ? <LoadingBar/> : ''}
       </div>
       <div className='flex justify-center p-5'>
-        <button className="rounded-md bg-rose-400 hover:bg-rose-600 p-5" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Processing Image...' : 'Submit'}
-        </button>
+          {errorOccurred ? 'There was an issue with processing the image. Please try again!' : ''}
       </div>
       <div className='flex justify-center'>
         {message && <p>{message}</p>}

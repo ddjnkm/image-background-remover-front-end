@@ -9,7 +9,7 @@ interface ImageResultProps {
 
 const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   
-  const BUCKET_URL = process.env.AWS_IMAGE_BUCKET_URL ?? 'https://image-background-remover-modified-images.s3.us-east-2.amazonaws.com';
+  const BUCKET_URL = 'https://image-background-remover-modified-images.s3.us-east-2.amazonaws.com';
 
   const backgroundImageFileInputRef = useRef<HTMLInputElement | null>(null);  // reference for file input
 
@@ -182,8 +182,8 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     ctx.restore();
 
     const link = document.createElement('a');
-    link.download = 'result.png';
-    link.href = canvas.toDataURL('image/png');
+    link.download = 'photoshop-me-in-image.jpg';
+    link.href = canvas.toDataURL('image/jpg');
     link.click();
   };
 
@@ -193,9 +193,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
 
   return (
     <div className='border-t-1 border-b-1 border-gray-300'>
-      <div className='flex justify-center'>
-        <button onClick={triggerBackgroundImageFileInput} className="rounded-md bg-rose-400 hover:bg-rose-600 mt-5 p-5">Upload Your Own Background Image!</button> 
-      </div>
+      <div className='flex flex-row justify-center'>
       <div className="editor-container" style={styleEditorContainer}>
         <img src={backgroundImage?.src} alt="" className="background-image" />
         <Draggable onStop={handleDragStop} position={overlayPosition}>
@@ -228,7 +226,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
         </Draggable>
         <canvas ref={canvasRef} style={{ display: 'none' }} />
       </div>
-      <div className="controls">
+      <div className="controls place-content-center px-2">
         <label>
           Rotate:
           <input
@@ -255,7 +253,8 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
           />
         </label>
         <button onClick={toggleFlip} className="rounded-md bg-blue-600 hover:bg-blue-800 m-2 p-2 text-white">Flip</button>
-        <button onClick={handleDownload} className="rounded-md bg-blue-600 hover:bg-blue-800 m-2 p-2 text-white">Download</button>
+        <button onClick={handleDownload} className="rounded-md bg-blue-600 hover:bg-blue-800 m-2 p-2 text-white">Download Image!</button>
+      </div>
       </div>
       <input
         type="file"
@@ -264,6 +263,9 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
         ref={backgroundImageFileInputRef}
         style={{ display: 'none' }} // Hide the actual file input
       />
+            <div className='flex justify-center'>
+        <button onClick={triggerBackgroundImageFileInput} className="rounded-md bg-blue-600 hover:bg-blue-800 mt-5 p-5 text-white">Upload Your Own Background Image!</button> 
+      </div>
       <BackgroundGallery onSelect={handleBackgroundImageSelect} />
     </div>
   );
