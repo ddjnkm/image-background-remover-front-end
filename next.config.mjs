@@ -8,7 +8,7 @@ const nextConfig = {
         ignoreBuildErrors: true,
       },
     env: {
-      AWS_REGION: process.env.AWS_REGION,
+      AWS_BUCKET_REGION: process.env.AWS_BUCKET_REGION,
       ACCESS_KEY_ID: process.env.ACCESS_KEY_ID,
       SECRET_ACCESS_KEY: process.env.SECRET_ACCESS_KEY,
     },

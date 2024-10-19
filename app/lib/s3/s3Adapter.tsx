@@ -6,7 +6,7 @@ import { Readable } from 'stream'; // If you're working with streams
 
 // AWS S3 Client configuration
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_BUCKET_REGION,
   credentials: {
     accessKeyId: process.env.ACCESS_KEY_ID,
     secretAccessKey: process.env.SECRET_ACCESS_KEY
