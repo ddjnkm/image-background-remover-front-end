@@ -42,16 +42,10 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   }
 
   function calculateBackgroundStartingSize (bgWidth: number, bgHeight: number, viewImageWidthSize: number) {
-    if (bgWidth > viewImageWidthSize) {
       const x = viewImageWidthSize / bgWidth;
       const height = bgHeight * x;
       const width = bgWidth * x;
       return {width, height}
-    }
-    const x = bgWidth / viewImageWidthSize;
-    const height = bgHeight * x;
-    const width = bgWidth * x;
-    return {width, height}
   }
 
   function calculateOverlayStartingSize (bgWidth: number, bgHeight: number, ovWidth: number, ovHeight: number) {

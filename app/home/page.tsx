@@ -4,6 +4,7 @@ import Header from '../header';
 import Footnote from "../footer";
 import UploadImage from "./uploadImage";
 import IntroPage from './introPage';
+import TestImage from './testImage';
 
 export default function HomePage() {
   return (
@@ -11,12 +12,13 @@ export default function HomePage() {
         <div>
         <Header />          
         </div>
-        <div className="grow 2xl:mx-64">
+        <div className="grow 2xl:mx-64 mb-12">
           <UploadImage />
           <IntroPage />
+          <TestImage />
         </div>
         <div>
-        <Footnote />          
+        <Footnote />
         </div>
     </div>
   );

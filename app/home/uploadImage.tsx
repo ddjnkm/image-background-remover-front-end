@@ -8,7 +8,7 @@ const UploadImage: React.FC = () => {
       <div className='flex justify-between items-center'>
           <div className="w-full h-auto">
               <div className='flex justify-center'>
-                <h1 className='text-3xl pb-5'>Upload an image to get started!</h1>
+                <h2 className='text-3xl pb-5'>Upload an image to get started!</h2>
               </div>
               <div className='flex justify-center text-center'>
               <p>{`Upload an image of yourself or someone else and photoshop them into a picture! Super quick, easy and free way to edit someone or something into a background.`}</p>
