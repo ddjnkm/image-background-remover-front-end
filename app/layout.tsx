@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Photoshop Me In! Free AI-Powered Photo Editor: Easily Place Yourself or Objects into Any Scene",
+  title: "Photoshop Me In! Free AI-Powered Photo Editor: Easily Place Yourself or Objects into Any Image",
   description: "Looking for a quick, easy, and free way to edit photos? Our AI-powered photo editor allows you to effortlessly\
  crop yourself or any object from one image and place it into a new background or scene. No technical skills required! Simply upload\
   your photo, let our advanced AI do the work, and download your professionally edited image in seconds. Whether you're creating fun,\
