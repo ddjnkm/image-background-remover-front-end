@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
-const testImage: React.FC = () => {
+const TestImage: React.FC = () => {
 
     const TEST_IMAGE_KEY = 'test-source-image-1729394639756.jpg';
 
@@ -30,4 +30,4 @@ const testImage: React.FC = () => {
     );
 }
 
-export default testImage;
+export default TestImage;
