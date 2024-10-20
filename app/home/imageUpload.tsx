@@ -7,6 +7,7 @@ import LoadingBar from '../lib/components/loadingBar';
 
 const AWS_SOURCE_BUCKET_NAME = "image-background-remover-source-images";
 const AWS_MODIFIED_BUCKET_URL = 'https://image-background-remover-modified-images.s3.us-east-2.amazonaws.com';
+const MAX_FILE_SIZE_ALLOWS_BYTES = 2097152;
 
 const ImageUpload: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -63,6 +64,11 @@ const ImageUpload: React.FC = () => {
 
     const reader = new FileReader();
     reader.onloadend = async () => {
+      const readerArrayBuffer = reader.result as ArrayBuffer
+      if (readerArrayBuffer.byteLength > MAX_FILE_SIZE_ALLOWS_BYTES) {
+        setMessage('Image file size is too large! Please use an image that is less than 2MB.');
+        return;
+      }
       setLoading(true);
       setMessage(null);
       try {
