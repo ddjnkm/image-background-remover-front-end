@@ -122,7 +122,7 @@ const ImageUpload: React.FC = () => {
   return (
     <div className='flex-col'>
       <div className='flex justify-center p-5'>
-        <button className="rounded-md upload-button bg-blue-600 hover:bg-blue-800 p-5 text-white" onClick={handleButtonClick}>
+        <button className="rounded-md upload-button bg-blue-600 hover:bg-blue-800 p-5 text-white" onClick={handleButtonClick} disabled={loading}>
           Upload Image
         </button>
         <input type='file' id='file' accept="image/*" ref={inputFile} style={{display: 'none'}} onChange={handleImageChange}/>
