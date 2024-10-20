@@ -4,8 +4,6 @@ import {
   } from "@aws-sdk/client-s3";
 import { Readable } from 'stream'; // If you're working with streams
 
-const SOURCE_S3_BUCKET = "https://image-background-remover-source-images.s3.us-east-2.amazonaws.com";
-
 // AWS S3 Client configuration
 const s3Client = new S3Client({
   region: process.env.NEXT_PUBLIC_AWS_BUCKET_REGION,
@@ -44,8 +42,4 @@ export async function uploadJpgToS3({
         console.error("Error uploading JPG file:", error);
         throw new Error("Error uploading image file: "+error);
     }
-}
-
-export function getAssetImageUrl(keyId: string) {
-  return `${SOURCE_S3_BUCKET}/${keyId}`;
 }
