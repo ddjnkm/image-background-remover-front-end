@@ -197,7 +197,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       <div className='lg:flex flex-row justify-center'>
       <div className='flex justify-center'>
         <div className="editor-container" style={styleEditorContainer}>
-          <img src={backgroundImage?.src} alt="" className="background-image" />
+          <img src={backgroundImage?.src} alt="" className="background-image" crossOrigin='anonymous'/>
           <Draggable onStop={handleDragStop} position={overlayPosition}>
             <ResizableBox
               width={overlaySize.width}
@@ -222,6 +222,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
                     objectFit: 'contain',
                     pointerEvents: 'none', // Prevent image from interfering with drag and resize events
                   }}
+                  crossOrigin="anonymous"
                 />
               </div>
             </ResizableBox>

@@ -1,5 +1,5 @@
 import React from "react";
-import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link} from "@nextui-org/react";
+import {Navbar, NavbarBrand, Image, Link} from "@nextui-org/react";
 
 const Header: React.FC = () => {
   return (
@@ -7,7 +7,7 @@ const Header: React.FC = () => {
       <NavbarBrand className="lg:ml-36 md:ml-24">
         <Link href="/home">
           <div className="flex flex-row">
-            <img className="sm" src={`home/icon-small.png`} alt="image" />
+            <Image className="sm" src={`home/icon-small.png`} alt="image" />
             <div className="flex items-center justify-center">
               <p className="pl-4 font-bold text-black text-center">Photoshop Me In!</p>
             </div>
