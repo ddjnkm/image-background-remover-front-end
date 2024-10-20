@@ -59,7 +59,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   }
 
   useEffect(() => {
-    if (overlayImage === null || backgroundImage === null || overlayImage.width === 0) {
+    if (overlayImage === null || backgroundImage === null || overlayImage.width === 0 || backgroundImage.width === 0) {
       let viewImageWidthSize = (window.innerWidth*0.75 < MAX_VIEW_IMAGE_SIZE) ? window.innerWidth*0.75 : MAX_VIEW_IMAGE_SIZE;
 
       const bgImage = new Image();
