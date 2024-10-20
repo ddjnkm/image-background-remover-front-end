@@ -20,8 +20,7 @@ const BackgroundGallery: React.FC<ImageGridProps> = ({ onSelect }) => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginTop: '2.5rem', marginBottom: '5rem', marginLeft: '30%', marginRight: '30%'
-     }}>
+    <div className='grid grid-cols-4 gap-2.5 mt-10 mb-20 xl:mx-96 lg:mx-64 md:mx-32 sm:mx-4'>
       {images.map((image, index) => (
         <img
           key={index}
