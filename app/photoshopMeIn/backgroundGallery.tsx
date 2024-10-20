@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { getAssetImageUrl } from '../lib/s3/s3Adapter';
 
 interface ImageGridProps {
   onSelect: (image: string) => void;
 }
 
 const images = [
-  '/assets/background_picture_1.jpg',
-  '/assets/background_picture_2.jpg',
-  '/assets/background_picture_3.jpg',
-  '/assets/background_picture_4.jpg'
+  getAssetImageUrl("asset_background_picture_1.jpg"),
+  getAssetImageUrl("asset_background_picture_2.jpg"),
+  getAssetImageUrl("asset_background_picture_3.jpg"),
+  getAssetImageUrl("asset_background_picture_4.jpg")
 ];
 
 const BackgroundGallery: React.FC<ImageGridProps> = ({ onSelect }) => {

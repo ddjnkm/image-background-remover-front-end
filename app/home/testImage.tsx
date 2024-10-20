@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { getAssetImageUrl } from '../lib/s3/s3Adapter';
 
 const TestImage: React.FC = () => {
 
@@ -23,7 +24,7 @@ const TestImage: React.FC = () => {
                         Click here to try it out!
                         </button>
                     </div>
-                    <img className='object-scale-down lg:w-96 md:w-64' src="/home/asset_13.jpg" alt="image" />
+                    <img className='object-scale-down lg:w-96 md:w-64' src={getAssetImageUrl("asset_13.png")} alt="image" />
                 </div>
             </div>
         </div>

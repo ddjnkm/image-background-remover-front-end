@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import Draggable, { DraggableData, DraggableEvent, DraggableEventHandler } from 'react-draggable';
 import { ResizableBox, ResizableBoxProps } from 'react-resizable';
 import BackgroundGallery from './backgroundGallery';
+import { getAssetImageUrl } from '../lib/s3/s3Adapter';
 
 interface ImageResultProps {
   imageId: string;
@@ -65,7 +66,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
     if (overlayImage === null || backgroundImage === null) {
       const bgImage = new Image();
       bgImage.crossOrigin = 'anonymous';
-      bgImage.src = '/assets/background_picture_1.jpg';
+      bgImage.src = getAssetImageUrl('asset_background_picture_1.jpg');
 
       const ovImage = new Image();
       ovImage.crossOrigin = 'anonymous';
