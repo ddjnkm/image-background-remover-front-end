@@ -14,7 +14,6 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
 
   const backgroundImageFileInputRef = useRef<HTMLInputElement | null>(null);  // reference for file input
 
-  const [imageViewSize, setImageViewSize] = useState<number>(0);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
   const [rotation, setRotation] = useState<number>(0);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
@@ -60,9 +59,9 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
   }
 
   useEffect(() => {
-    let viewImageWidthSize = (window.innerWidth*0.75 < MAX_VIEW_IMAGE_SIZE) ? window.innerWidth*0.75 : MAX_VIEW_IMAGE_SIZE;
-    setImageViewSize(viewImageWidthSize);
-    if (overlayImage === null || backgroundImage === null) {
+    if (overlayImage === null || backgroundImage === null || overlayImage.width === 0 || backgroundImage.width === 0) {
+      let viewImageWidthSize = (window.innerWidth*0.75 < MAX_VIEW_IMAGE_SIZE) ? window.innerWidth*0.75 : MAX_VIEW_IMAGE_SIZE;
+
       const bgImage = new Image();
       bgImage.crossOrigin = 'anonymous';
       bgImage.src = 'assets/asset_background_picture_1.jpg';
@@ -197,7 +196,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       <div className='lg:flex flex-row justify-center'>
       <div className='flex justify-center'>
         <div className="editor-container" style={styleEditorContainer}>
-          <img src={backgroundImage?.src} alt="" className="background-image" />
+          <img src={backgroundImage?.src} alt="" className="background-image" crossOrigin='anonymous'/>
           <Draggable onStop={handleDragStop} position={overlayPosition}>
             <ResizableBox
               width={overlaySize.width}
@@ -222,6 +221,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
                     objectFit: 'contain',
                     pointerEvents: 'none', // Prevent image from interfering with drag and resize events
                   }}
+                  crossOrigin="anonymous"
                 />
               </div>
             </ResizableBox>

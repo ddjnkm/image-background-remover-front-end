@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Image } from '@nextui-org/react';
 
 interface ImageGridProps {
   onSelect: (image: string) => void;
@@ -22,7 +23,7 @@ const BackgroundGallery: React.FC<ImageGridProps> = ({ onSelect }) => {
   return (
     <div className='grid grid-cols-4 gap-2.5 mt-10 mb-20 xl:mx-96 lg:mx-64 md:mx-32 sm:mx-4'>
       {images.map((image, index) => (
-        <img
+        <Image
           key={index}
           src={image}
           alt={`image-${index}`}
