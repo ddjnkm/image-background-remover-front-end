@@ -73,15 +73,16 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       ovImage.src = fetchImageUrl(imageId);
 
       bgImage.onload = () => setBackgroundImage(bgImage);
-      ovImage.onload = () => setOverlayImage(ovImage);
-
-      setOverlayActualSize({width: ovImage.width, height: ovImage.height});
-      const defaultBackgroundSize = calculateBackgroundStartingSize(bgImage.width, bgImage.height, viewImageWidthSize);
-      setBackgroundImageSize({width: defaultBackgroundSize.width, height: defaultBackgroundSize.height});
-      const defaultOverlaySize = calculateOverlayStartingSize(defaultBackgroundSize.width, defaultBackgroundSize.height, ovImage.width, ovImage.height);
-      setOverlayOriginalSize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
-      setOverlaySize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
-      setInitialOverlayPosition(defaultBackgroundSize.width, defaultBackgroundSize.height, defaultOverlaySize);
+      ovImage.onload = () => {
+        setOverlayImage(ovImage);
+        setOverlayActualSize({width: ovImage.width, height: ovImage.height});
+        const defaultBackgroundSize = calculateBackgroundStartingSize(bgImage.width, bgImage.height, viewImageWidthSize);
+        setBackgroundImageSize({width: defaultBackgroundSize.width, height: defaultBackgroundSize.height});
+        const defaultOverlaySize = calculateOverlayStartingSize(defaultBackgroundSize.width, defaultBackgroundSize.height, ovImage.width, ovImage.height);
+        setOverlayOriginalSize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+        setOverlaySize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
+        setInitialOverlayPosition(defaultBackgroundSize.width, defaultBackgroundSize.height, defaultOverlaySize);
+      }
     }
   });
 
