@@ -65,21 +65,23 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       const bgImage = new Image();
       bgImage.crossOrigin = 'anonymous';
       bgImage.src = 'assets/asset_background_picture_1.jpg';
+      bgImage.width = 2784;
+      bgImage.height = 1856;
 
       const ovImage = new Image();
       ovImage.crossOrigin = 'anonymous';
       ovImage.src = fetchImageUrl(imageId);
-      setOverlayActualSize({width: ovImage.width, height: ovImage.height});
 
+      bgImage.onload = () => setBackgroundImage(bgImage);
+      ovImage.onload = () => setOverlayImage(ovImage);
+
+      setOverlayActualSize({width: ovImage.width, height: ovImage.height});
       const defaultBackgroundSize = calculateBackgroundStartingSize(bgImage.width, bgImage.height, viewImageWidthSize);
       setBackgroundImageSize({width: defaultBackgroundSize.width, height: defaultBackgroundSize.height});
       const defaultOverlaySize = calculateOverlayStartingSize(defaultBackgroundSize.width, defaultBackgroundSize.height, ovImage.width, ovImage.height);
       setOverlayOriginalSize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
       setOverlaySize({width: defaultOverlaySize.width, height: defaultOverlaySize.height});
       setInitialOverlayPosition(defaultBackgroundSize.width, defaultBackgroundSize.height, defaultOverlaySize);
-
-      bgImage.onload = () => setBackgroundImage(bgImage);
-      ovImage.onload = () => setOverlayImage(ovImage);
     }
   });
 
@@ -196,7 +198,7 @@ const ImageResult: React.FC<ImageResultProps> = ({ imageId }) => {
       <div className='lg:flex flex-row justify-center'>
       <div className='flex justify-center'>
         <div className="editor-container" style={styleEditorContainer}>
-          <img src={backgroundImage?.src} alt="" className="background-image" crossOrigin='anonymous'/>
+          <img src={backgroundImage?.src} alt="" className="background-image" crossOrigin='anonymous' width={backgroundImageSize.width} height={backgroundImageSize.height}/>
           <Draggable onStop={handleDragStop} position={overlayPosition}>
             <ResizableBox
               width={overlaySize.width}
